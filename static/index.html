@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Industrial IoT Sensor Anomaly Detection Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="glass-bg-container">
+        <!-- Floating decorative glowing circles -->
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+
+        <header class="dashboard-header glass-card">
+            <div class="header-logo">
+                <i class="fa-solid fa-microchip-board logo-icon"></i>
+                <div class="header-text">
+                    <h1>Sensor Anomaly Detection</h1>
+                    <p>IoT Sensor Health, Accuracy & Anomaly Detection Pipeline</p>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="selector-wrapper">
+                    <label for="dataset-select"><i class="fa-solid fa-database"></i> Dataset:</label>
+                    <select id="dataset-select" class="glass-select">
+                        <option value="industrial" selected>Industrial Multi-Sensor (Simulated)</option>
+                        <option value="ambient_temperature">Ambient Temperature (NAB)</option>
+                        <option value="machine_temperature">Machine Temperature (NAB)</option>
+                    </select>
+                </div>
+                <div id="ai-model-status" class="ai-badge badge-warning">
+                    <span class="status-dot"></span>
+                    <span class="status-text">AI Heuristics Active</span>
+                </div>
+                <button id="stream-toggle" class="glass-btn primary"><i class="fa-solid fa-play"></i> Start Stream</button>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Left Panel: Real-time Telemetry & Health Gauges -->
+            <section class="telemetry-section grid-span-8">
+                <div class="section-title">
+                    <h2><i class="fa-solid fa-gauge-high"></i> Live Telemetry & Metrics</h2>
+                    <span id="update-pulse" class="pulse-indicator"></span>
+                </div>
+
+                <div id="sensor-cards-container" class="sensor-cards-grid">
+                    <!-- Sensor cards will be dynamically injected here by app.js -->
+                    <div class="loading-placeholder">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading telemetry cards...
+                    </div>
+                </div>
+
+                <div class="chart-container glass-card">
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-chart-line"></i> Real-time Sensor Data Stream</h3>
+                        <div class="chart-legend">
+                            <span class="legend-item"><span class="legend-dot normal"></span> Normal</span>
+                            <span class="legend-item"><span class="legend-dot anomaly"></span> Anomaly Flag</span>
+                        </div>
+                    </div>
+                    <div class="canvas-wrapper">
+                        <canvas id="live-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: AI Trainer & Anomaly Injector -->
+            <section class="control-section grid-span-4">
+                <!-- ML Model Trainer Card -->
+                <div class="glass-card panel-card ml-trainer-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-brain"></i> GPU AI Model Trainer</h3>
+                        <span class="gpu-indicator"><i class="fa-solid fa-bolt"></i> CUDA RTX 3070</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="train-config">
+                            <div class="config-row">
+                                <div class="config-col">
+                                    <label for="train-epochs">Epochs</label>
+                                    <input type="number" id="train-epochs" value="15" min="5" max="100" class="glass-input">
+                                </div>
+                                <div class="config-col">
+                                    <label for="train-batch">Batch Size</label>
+                                    <input type="number" id="train-batch" value="64" min="16" max="256" class="glass-input">
+                                </div>
+                            </div>
+                            <button id="train-btn" class="glass-btn accent w-100">
+                                <i class="fa-solid fa-play-circle"></i> Train ML Models
+                            </button>
+                        </div>
+
+                        <!-- Training Progress Dashboard -->
+                        <div id="training-progress-container" class="training-progress hidden">
+                            <div class="progress-info">
+                                <span id="training-epoch-label">Epoch 0/15</span>
+                                <span id="training-speed-label">0.0s/epoch</span>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div id="training-progress-bar" class="progress-bar-fill"></div>
+                            </div>
+                            <p id="training-status-message">Initializing...</p>
+                            
+                            <div class="progress-stats">
+                                <div>ETA: <span id="training-eta">--</span></div>
+                                <div>Device: <span id="training-device" class="device-name">--</span></div>
+                            </div>
+
+                            <div class="loss-chart-wrapper">
+                                <canvas id="loss-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Control / Anomaly Injector Card -->
+                <div class="glass-card panel-card injector-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-triangle-exclamation"></i> Fault & Anomaly Injector</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="section-desc">Inject faults to verify how PyTorch Autoencoder and Isolation Forest detect anomalies and recalibrate accuracy.</p>
+                        
+                        <div id="industrial-injectors" class="injector-grid">
+                            <button class="inject-btn warning" data-fault="temp_spike">
+                                <i class="fa-solid fa-temperature-arrow-up"></i> Temp Spike
+                            </button>
+                            <button class="inject-btn warning" data-fault="temp_drift">
+                                <i class="fa-solid fa-chart-line-up"></i> Fan Failure
+                            </button>
+                            <button class="inject-btn danger" data-fault="pressure_leak">
+                                <i class="fa-solid fa-droplet-slash"></i> Pressure Leak
+                            </button>
+                            <button class="inject-btn danger" data-fault="vibration_wear">
+                                <i class="fa-solid fa-gear-spin"></i> Bearing Wear
+                            </button>
+                            <button class="inject-btn info" data-fault="sensor_drift">
+                                <i class="fa-solid fa-arrows-spin"></i> Calibration Drift
+                            </button>
+                            <button class="inject-btn info" data-fault="sensor_noise">
+                                <i class="fa-solid fa-wave-square"></i> Sensor Noise
+                            </button>
+                            <button class="inject-btn info" data-fault="sensor_flatline">
+                                <i class="fa-solid fa-bars"></i> Sensor Flatline
+                            </button>
+                            <button id="reset-sim-btn" class="inject-btn success reset-btn">
+                                <i class="fa-solid fa-rotate-left"></i> Reset System
+                            </button>
+                        </div>
+
+                        <div id="single-sensor-injectors" class="injector-grid hidden">
+                            <button class="inject-btn warning" data-fault="temp_spike">
+                                <i class="fa-solid fa-temperature-arrow-up"></i> Value Spike
+                            </button>
+                            <button class="inject-btn danger" data-fault="temp_drift">
+                                <i class="fa-solid fa-chart-line-up"></i> Value Drift
+                            </button>
+                            <button id="reset-single-btn" class="inject-btn success reset-btn">
+                                <i class="fa-solid fa-rotate-left"></i> Reset System
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Panel: Anomaly Event Log -->
+            <section class="log-section grid-span-12">
+                <div class="glass-card event-log-card">
+                    <div class="log-header">
+                        <h3><i class="fa-solid fa-list-check"></i> AI Anomaly & Maintenance Event Log</h3>
+                        <button id="clear-log-btn" class="glass-btn text-btn"><i class="fa-solid fa-trash-can"></i> Clear Log</button>
+                    </div>
+                    <div class="log-table-wrapper">
+                        <table class="log-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Level</th>
+                                    <th>Event Description</th>
+                                    <th>Suspect Sensors</th>
+                                    <th>AI Actionable Recommendation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="anomaly-log-body">
+                                <tr>
+                                    <td colspan="5" class="empty-log-msg">
+                                        <i class="fa-solid fa-shield-halved"></i> No anomalies detected. System running normally.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

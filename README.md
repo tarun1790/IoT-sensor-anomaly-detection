@@ -2,7 +2,7 @@
 
 ### Internship Details
 * **Intern Name**: Jampani Tarun Sai
-* **Intern ID**: CT-655
+* **Intern ID**: CITS1344
 * **Internship Duration**: 12 Weeks
 
 ---
